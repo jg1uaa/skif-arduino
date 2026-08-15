@@ -5,9 +5,9 @@
 
 There are many ways to connect a telegraph (morse) key to a PC. Modern PCs do not have an RS-232C port with a real UART (16550) controller. Therefore, users connect keys to the DTR/CTS/DTR lines via USB-UART adapters, or use USB-HID devices instead.
 
-However, USB devices make it impossible to avoid the latency introduced by the USB host controller and protocol stack. A low-speeed (1.5Mbps) USB-HID device uses interrupt transfer with 10ms interval, even if using Full-speed (12Mbps) it will be 1ms. Many USB-UART devices have 1ms latency because they use Full-speed bulk transfer.
+However, USB devices make it impossible to avoid the latency introduced by the USB host controller and protocol stack. A low-speed (1.5Mbps) USB-HID device uses interrupt transfer with 10ms interval, even if using Full-speed (12Mbps) it will be 1ms. Many USB-UART devices have 1ms latency because they use Full-speed bulk transfer.
 
-This project is an experiment to monitor key status and timing using a microcontroller, ensuiring accurate time measurement for key switching.
+This project is an experiment to monitor key status and timing using a microcontroller, ensuring accurate time measurement for key switching.
 
 
 ## Prerequisites
@@ -38,7 +38,7 @@ This command does not affect the sampling rate setting. If needed, applications 
 
 ### CMD_RATE ('0' ... '7')
 
-Stops cupturing and sets new sampling rate.
+Stops capturing and sets new sampling rate.
 
 - 0: 16k samples/sec (62.5us period)
 - 1: 8k samples/sec (125us) [default]
