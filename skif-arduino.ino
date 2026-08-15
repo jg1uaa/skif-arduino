@@ -68,6 +68,7 @@ static void serial_receive(void)
 			break;
 		case CMD_QUERY_RATE:
 			serial_send(CMD_RATE(Rate));
+			CurrSysStatus = SysStop;
 			break;
 		}
 	}

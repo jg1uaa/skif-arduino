@@ -23,7 +23,7 @@ Note: Debouncing is not defined in this protocol. Users can implement software l
 
 ### CMD_START ('-')
 
-Start capturing. Capturing will be stopped after receiving CMD_STOP, CMD_READY and CMD_RATE command.
+Starts capturing. Capturing will be stopped after receiving other commands.
 
 ### CMD_STOP ('.')
 
@@ -53,7 +53,7 @@ Returns new or current (if failed) mode as response.
 
 ### CMD_QUERY_RATE (',')
 
-Returns current sampling rate setting with '0' ... '7'.
+Stops capturing and returns current sampling rate setting with '0' ... '7'.
 
 
 ## Data format
