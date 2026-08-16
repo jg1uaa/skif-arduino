@@ -23,6 +23,9 @@ volatile unsigned char CurrPinStatus = 0;
 volatile unsigned char PrevPinStatus = 0;
 volatile unsigned char TimerExpired = 0;
 volatile unsigned char Rate = 1;
+volatile unsigned char PinMaskCount = 0;
+volatile unsigned char PinMaskCounter0 = 0;
+volatile unsigned char PinMaskCounter1 = 0;
 
 static void serial_send(unsigned char);
 
@@ -39,17 +42,23 @@ static void update_pin_status(void)
 		CurrPinStatus |= PIN1_ON;
 }
 
+static bool recv_one_char(unsigned char *c)
+{
+	unsigned char s;
+
+	if ((s = UCSR0A) & 0x80) {
+		*c = UDR0;
+		return (s & 0x10) ? false : true;
+	}
+
+	return false;
+}
+
 static void serial_receive(void)
 {
-	unsigned char d, s;
+	unsigned char d;
 
-	while ((s = UCSR0A) & 0x80) {
-		d = UDR0;
-
-		/* framing error */
-		if (s & 0x10)
-			continue;
-
+	while (recv_one_char(&d)) {
 		switch (d) {
 		case CMD_RATE(0) ... CMD_RATE(7):
 			Rate = d & 0x07;
@@ -70,6 +79,10 @@ static void serial_receive(void)
 			serial_send(CMD_RATE(Rate));
 			CurrSysStatus = SysStop;
 			break;
+		case CMD_DEBOUNCE_COUNTER:
+			while (!recv_one_char(&PinMaskCount));
+			CurrSysStatus = SysStop;
+			break;
 		}
 	}
 }
@@ -79,8 +92,14 @@ ISR(TIMER1_COMPA_vect)
 	update_pin_status();
 	serial_receive();
 
-	if (CurrSysStatus == SysRunning)
+	if (CurrSysStatus == SysRunning) {
 		Counter++;
+
+		if (PinMaskCounter0)
+			PinMaskCounter0--;
+		if (PinMaskCounter1)
+			PinMaskCounter1--;
+	}
 
 	TimerExpired = 1;
 }
@@ -138,6 +157,8 @@ void setup(void)
 
 void loop(void)
 {
+	unsigned char changed, useprev;
+
 	while (!TimerExpired)
 	      asm __volatile__("sleep");
 
@@ -152,14 +173,23 @@ void loop(void)
 		serial_send(CurrPinStatus);
 		PrevPinStatus = CurrPinStatus;
 		CurrSysStatus = SysRunning;
+		PinMaskCounter0 = PinMaskCounter1 = 0;
 		break;
 
 	case SysRunning:
-		if (((CurrPinStatus ^ PrevPinStatus) & PIN_MASK) ||
-		    Counter >= COUNTER_LIMIT) {
+		changed = (CurrPinStatus ^ PrevPinStatus) & PIN_MASK;
+		useprev = ((PinMaskCounter0 ? PIN0_ON : 0) |
+			   (PinMaskCounter1 ? PIN1_ON : 0));
+
+		if ((changed & ~useprev) || Counter >= COUNTER_LIMIT) {
 			serial_send(PrevPinStatus | Counter);
-			PrevPinStatus = CurrPinStatus;
+			PrevPinStatus &= useprev;
+			PrevPinStatus |= (CurrPinStatus & ~useprev);
 			Counter = 0;
+			if (changed & ~useprev & PIN0_ON)
+				PinMaskCounter0 = PinMaskCount;
+			if (changed & ~useprev & PIN1_ON)
+				PinMaskCounter1 = PinMaskCount;
 		}
 		break;
 	}

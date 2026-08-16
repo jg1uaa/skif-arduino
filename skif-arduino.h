@@ -16,5 +16,6 @@
 #define CMD_STOP '.'
 #define CMD_START '-'
 #define CMD_QUERY_RATE ','
+#define CMD_DEBOUNCE_COUNTER '+'
 
 #endif

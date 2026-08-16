@@ -16,8 +16,6 @@ This project is an experiment to monitor key status and timing using a microcont
 - PC's USB-UART driver supports 500000bps, 8bit data, 1 stop bit and non-parity
 - Your favorite straight key or paddle (supports up to 2-channel inputs)
 
-Note: Debouncing is not defined in this protocol. Users can implement software logic and/or hardware circuits.
-
 
 ## Commands
 
@@ -54,6 +52,10 @@ Returns new or current (if failed) mode as response.
 ### CMD_QUERY_RATE (',')
 
 Stops capturing and returns current sampling rate setting with '0' ... '7'.
+
+### CMD_DEBOUNCE_COUNTER ('+')
+
+Stops capturing and sets debounce counter. Following unsigned byte is counter value, 0x00 - 0xff. Default is 0x00 (debounce disabled). No response for this command.
 
 
 ## Data format
