@@ -18,12 +18,13 @@ enum SysStatus {
 };
 
 volatile unsigned char Counter = 0;
+volatile unsigned char MaxCounter = DEFAULT_MAX_COUNTER;
 volatile unsigned char CurrSysStatus = SysStop;
 volatile unsigned char CurrPinStatus = 0;
 volatile unsigned char PrevPinStatus = 0;
 volatile unsigned char TimerExpired = 0;
 volatile unsigned char Rate = DEFAULT_RATE;
-volatile unsigned char PinMaskCount = DEFAULT_PINMASKCOUNT;
+volatile unsigned char PinMaskCount = DEFAULT_DEBOUNCE_COUNTER;
 volatile unsigned char PinMaskCounter0 = 0;
 volatile unsigned char PinMaskCounter1 = 0;
 
@@ -68,8 +69,9 @@ static void serial_receive(void)
 			CurrSysStatus = SysStop;
 			break;
 		case CMD_RESET:
+			MaxCounter = DEFAULT_MAX_COUNTER;
 			Rate = DEFAULT_RATE;
-			PinMaskCount = DEFAULT_PINMASKCOUNT;
+			PinMaskCount = DEFAULT_DEBOUNCE_COUNTER;
 			serial_send(d);
 			/* FALLTHROUGH */
 		case CMD_STOP:
@@ -85,6 +87,12 @@ static void serial_receive(void)
 			break;
 		case CMD_DEBOUNCE_COUNTER:
 			while (!recv_one_char(&PinMaskCount));
+			CurrSysStatus = SysStop;
+			break;
+		case CMD_MAX_COUNTER:
+			while (!recv_one_char(&d));
+			d &= COUNTER_MASK;
+			if (d) MaxCounter = d;
 			CurrSysStatus = SysStop;
 			break;
 		}
@@ -185,7 +193,7 @@ void loop(void)
 		useprev = ((PinMaskCounter0 ? PIN0_ON : 0) |
 			   (PinMaskCounter1 ? PIN1_ON : 0));
 
-		if ((changed & ~useprev) || Counter >= COUNTER_LIMIT) {
+		if ((changed & ~useprev) || Counter >= MaxCounter) {
 			serial_send(PrevPinStatus | Counter);
 			PrevPinStatus &= useprev;
 			PrevPinStatus |= (CurrPinStatus & ~useprev);

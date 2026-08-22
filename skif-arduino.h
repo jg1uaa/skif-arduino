@@ -17,8 +17,10 @@
 #define CMD_START '-'
 #define CMD_QUERY_RATE ','
 #define CMD_DEBOUNCE_COUNTER '+'
+#define CMD_MAX_COUNTER '*'
 
 #define DEFAULT_RATE 1
-#define DEFAULT_PINMASKCOUNT 0
+#define DEFAULT_DEBOUNCE_COUNTER 0
+#define DEFAULT_MAX_COUNTER 32
 
 #endif

@@ -57,6 +57,10 @@ Stops capturing and returns current sampling rate setting with '0' ... '7'.
 
 Stops capturing and sets debounce counter. Following unsigned byte is counter value, 0x00 - 0xff. Default is 0x00 (debounce disabled). No response for this command.
 
+### CMD_MAX_COUNT ('*')
+
+Stops capturing and sets max counter ticks. Following unsigned byte is counter value, 0x01 - 0x3f. Default is 0x20. No response for this command.
+
 
 ## Data format
 
