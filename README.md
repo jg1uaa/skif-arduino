@@ -27,9 +27,9 @@ Starts capturing. Capturing will be stopped after receiving other commands.
 
 Simply stops capturing without response.
 
-### CMD_READY ('/')
+### CMD_RESET ('/')
 
-Stops capturing and send '/' response.
+Stops capturing, sets default state and send '/' response.
 
 Applications should use this command at startup to check controller is connected and ready.
 This command does not affect the sampling rate setting. If needed, applications issue CMD_RATE command.

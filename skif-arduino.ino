@@ -22,8 +22,8 @@ volatile unsigned char CurrSysStatus = SysStop;
 volatile unsigned char CurrPinStatus = 0;
 volatile unsigned char PrevPinStatus = 0;
 volatile unsigned char TimerExpired = 0;
-volatile unsigned char Rate = 1;
-volatile unsigned char PinMaskCount = 0;
+volatile unsigned char Rate = DEFAULT_RATE;
+volatile unsigned char PinMaskCount = DEFAULT_PINMASKCOUNT;
 volatile unsigned char PinMaskCounter0 = 0;
 volatile unsigned char PinMaskCounter1 = 0;
 
@@ -64,8 +64,12 @@ static void serial_receive(void)
 			Rate = d & 0x07;
 			timer_init();
 			timer_start();
-			/* FALLTHROUGH */
-		case CMD_READY:
+			serial_send(d);
+			CurrSysStatus = SysStop;
+			break;
+		case CMD_RESET:
+			Rate = DEFAULT_RATE;
+			PinMaskCount = DEFAULT_PINMASKCOUNT;
 			serial_send(d);
 			/* FALLTHROUGH */
 		case CMD_STOP:
