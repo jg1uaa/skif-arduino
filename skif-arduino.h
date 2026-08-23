@@ -15,7 +15,6 @@
 #define CMD_RESET '/'
 #define CMD_STOP '.'
 #define CMD_START '-'
-#define CMD_QUERY_RATE ','
 #define CMD_DEBOUNCE_COUNTER '+'
 #define CMD_MAX_COUNTER '*'
 

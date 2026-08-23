@@ -21,7 +21,7 @@ This project is an experiment to monitor key status and timing using a microcont
 
 ### CMD_START ('-')
 
-Starts capturing. Capturing will be stopped after receiving other commands.
+Starts capturing. Captured data stream will be come without response. The first captured data is initial pin status with timestamp = 0.
 
 ### CMD_STOP ('.')
 
@@ -29,10 +29,9 @@ Simply stops capturing without response.
 
 ### CMD_RESET ('/')
 
-Stops capturing, sets default state and send '/' response.
+Stops capturing, sets default state and send 0x00 response.
 
 Applications should use this command at startup to check controller is connected and ready.
-This command does not affect the sampling rate setting. If needed, applications issue CMD_RATE command.
 
 ### CMD_RATE ('0' ... '7')
 
@@ -47,19 +46,15 @@ Stops capturing and sets new sampling rate.
 - 6: 250 samples/sec (4ms)
 - 7: 125 samples/sec (8ms)
 
-Returns new or current (if failed) mode as response.
-
-### CMD_QUERY_RATE (',')
-
-Stops capturing and returns current sampling rate setting with '0' ... '7'.
+Returns 0x00 as response.
 
 ### CMD_DEBOUNCE_COUNTER ('+')
 
-Stops capturing and sets debounce counter. Following unsigned byte is counter value, 0x00 - 0xff. Default is 0x00 (debounce disabled). No response for this command.
+Stops capturing and sets debounce counter. Following unsigned byte is counter value, 0x00 - 0xff. Default is 0x00 (debounce disabled). Returns 0x00 as response.
 
 ### CMD_MAX_COUNT ('*')
 
-Stops capturing and sets max counter ticks. Following unsigned byte is counter value, 0x01 - 0x3f. Default is 0x20. No response for this command.
+Stops capturing and sets max counter ticks. Following unsigned byte is counter value, 0x01 - 0x3f. Default is 0x20. Returns 0x00 as response.
 
 
 ## Data format

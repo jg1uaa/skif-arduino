@@ -65,14 +65,14 @@ static void serial_receive(void)
 			Rate = d & 0x07;
 			timer_init();
 			timer_start();
-			serial_send(d);
+			serial_send(0);
 			CurrSysStatus = SysStop;
 			break;
 		case CMD_RESET:
 			MaxCounter = DEFAULT_MAX_COUNTER;
 			Rate = DEFAULT_RATE;
 			PinMaskCount = DEFAULT_DEBOUNCE_COUNTER;
-			serial_send(d);
+			serial_send(0);
 			/* FALLTHROUGH */
 		case CMD_STOP:
 			CurrSysStatus = SysStop;
@@ -81,18 +81,16 @@ static void serial_receive(void)
 			Counter = 0;
 			CurrSysStatus = SysStart;
 			break;
-		case CMD_QUERY_RATE:
-			serial_send(CMD_RATE(Rate));
-			CurrSysStatus = SysStop;
-			break;
 		case CMD_DEBOUNCE_COUNTER:
 			while (!recv_one_char(&PinMaskCount));
+			serial_send(0);
 			CurrSysStatus = SysStop;
 			break;
 		case CMD_MAX_COUNTER:
 			while (!recv_one_char(&d));
 			d &= COUNTER_MASK;
 			if (d) MaxCounter = d;
+			serial_send(0);
 			CurrSysStatus = SysStop;
 			break;
 		}
